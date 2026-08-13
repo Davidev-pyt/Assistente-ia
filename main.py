@@ -3,7 +3,7 @@ import os
 from fastapi import FastAPI
 from dotenv import load_dotenv
 from groq import Groq
-
+from fastapi.middleware.cors import CORSMiddleware
 #Carregando as variáveis de ambiente do arquivo .env
 load_dotenv()
 
@@ -13,7 +13,13 @@ chave_api_groq = os.getenv("GROQ_API_KEY")
 client = Groq(api_key=chave_api_groq)
 #Criando a aplicação FastAPI
 app = FastAPI()
-
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"], # Autoriza QUALQUER site
+    allow_credentials=True,
+    allow_methods=["*"], # Autoriza todos os métodos (GET, POST, etc)
+    allow_headers=["*"], # Autoriza todos os cabeçalhos
+)
 #Criando a primeira rota da aplicação
 @app.get("/")
 def pagina_inicial():
