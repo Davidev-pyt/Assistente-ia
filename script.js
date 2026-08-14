@@ -3,6 +3,7 @@ const gerar_resumo = document.getElementById('gerar-resumo');
 const texto_materia = document.getElementById('texto-materia');
 const resumo_container = document.getElementById('resumo-container');
 const resultado_ia = document.getElementById('resultado-ia');
+const gerar_quiz = document.getElementById('gerar-quiz');
 
 // 2. O EVENTO DE CLIQUE
 gerar_resumo.addEventListener('click', async function(event) {
@@ -49,6 +50,52 @@ gerar_resumo.addEventListener('click', async function(event) {
         // Se o Python estiver desligado ou der erro, avisa o usuário
         alert("Erro ao conectar com o servidor Back-End. Certifique-se de que o Python está rodando!");
         console.error(erro);
+    }finally {
+        gerar_resumo.innerHTML = 'Gerar Resumo';
+        gerar_resumo.classList.remove('animate-pulse', 'bg-indigo-800');
     }
 
 });
+    
+gerar_quiz.addEventListener('click', async function (event) {
+    event.preventDefault();
+    const texto = texto_materia.value;
+    if (!texto) {
+        alert('Por favor, insira um texto valido para gerar o Quiz')
+        return;
+    }
+    //Alterar a animação do botão 
+    gerar_quiz.innerHTML = `
+      <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+
+    <span class="ml-2">Gerando Quiz...</span>
+    `;
+    //alterando a visão do botão
+    gerar_quiz.classList.add('animate-pulse', 'bg-emerald-800');
+
+    //Fazendo a chamada da API
+
+    try {
+        const resposta = await fetch('http://localhost:8000/quiz', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ "texto": texto })
+        });
+
+        const dadosDoServidor = await resposta.json();
+        resultado_ia.textContent = dadosDoServidor.resultado_quiz;
+        resumo_container.classList.remove('hidden');
+
+    } catch (erro) {
+        alert("Erro ao conectar com o servidor Back-End. Certifique-se de que o Python está rodando!");
+        console.error(erro);
+    } finally {
+        gerar_quiz.innerHTML = 'Gerar Quiz';
+        gerar_quiz.classList.remove('animate-pulse', 'bg-emerald-800');
+    }
+}); 
